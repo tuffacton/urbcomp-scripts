@@ -59,13 +59,15 @@ def hist_plot(x, xmin, alpha, plt_title):
 
 	model = sm.OLS(df['y'], sm.add_constant(df['x'])).fit()
 
+	nums, bins = np.histogram(x, bins=1000)
 	#plt.scatter(df['x'],df['y'],color='blue')
 	plt.figure();
 	plt.loglog(bins[1:],nums,label='original data')
 	plt.loglog(np.exp(df['x']), np.exp(df['x']*model.params[1] + model.params[0]),color='green',label='OLS fit: a={}'.format(np.round(model.params[1],2)))
 	plt.loglog(np.exp(df['x']), np.exp(df['x']*-alpha + model.params[0]),color='gray',label='Power-Law fit: a=-{}'.format(np.round(alpha,2)))
+	plt.axvline(x=xmin, color='k', linestyle='--')
 	plt.legend()
-	plt.title(plt_title)
+	plt.title('NYC')
 	plt.ylabel('Frequency of x',fontsize=16);
 	plt.xlabel('x',fontsize=16)
 	plt.draw()
