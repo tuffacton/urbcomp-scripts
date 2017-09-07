@@ -67,7 +67,7 @@ def hist_plot(x, xmin, alpha, plt_title):
 	plt.loglog(np.exp(df['x']), np.exp(df['x']*-alpha + model.params[0]),color='gray',label='Power-Law fit: a=-{}'.format(np.round(alpha,2)))
 	plt.axvline(x=xmin, color='k', linestyle='--')
 	plt.legend()
-	plt.title('NYC')
+	plt.title(plt_title)
 	plt.ylabel('Frequency of x',fontsize=16);
 	plt.xlabel('x',fontsize=16)
 	plt.draw()
