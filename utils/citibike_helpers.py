@@ -2,10 +2,14 @@ import pandas as pd
 import networkx as nx
 import seaborn as sns
 import matplotlib.pyplot as plt
+import numpy as np
 import operator
 import datetime
 import geopandas as gp #might need to install
 from shapely.geometry import Point
+from collections import defaultdict
+from scipy.cluster import hierarchy
+from scipy.spatial import distance
 
 def get_unique_column_values(df,colname):
 	return df[colname].unique()
@@ -198,3 +202,74 @@ def plot_network(g,nodecolor='g',nodesize=1200,nodealpha=0.6,edgecolor='k',\
     if savefig and filename!=None:
         plt.savefig(filename,dpi=300)
 
+def create_hc(G):
+    """Creates hierarchical cluster of graph G from distance matrix"""
+    path_length=nx.all_pairs_shortest_path_length(G)
+    distances=np.zeros((len(G),len(G)))
+    for u,p in path_length.items():
+        for v,d in p.items():
+            distances[u][v]=d
+    # Create hierarchical cluster
+    Y=distance.squareform(distances)
+    Z=hierarchy.complete(Y)  # Creates HC using farthest point linkage
+    # This partition selection is arbitrary, for illustrive purposes
+    membership=list(hierarchy.fcluster(Z,t=1.15))
+    # Create collection of lists for blockmodel
+    partition=defaultdict(list)
+    for n,p in zip(list(range(len(G))),membership):
+        partition[p].append(n)
+    return list(partition.values())
+
+def draw_hc(G, lvl):
+    plt.close()
+    plt.ion()
+    fig=plt.figure(figsize=(9,6))
+    plt.axis("off")
+    G=nx.convert_node_labels_to_integers(G)
+    partitions=create_hc(G)
+    BM=nx.blockmodel(G,partitions)
+    node_size=[BM.node[x]['nnodes']*10 for x in BM.nodes()]
+    edge_width=[1 for (u,v,d) in BM.edges(data=True)]
+    pos = nx.spring_layout(BM,iterations=200)
+    nx.draw(BM,pos,node_size=node_size,width=edge_width,with_labels=False)
+    plt.title('Agglomerative Hierarchical Clustering for Citibike Network, lvl {}'.format(lvl))
+    plt.show()
+    return BM, partitions
+
+def dhc(Gc):
+    H = Gc.copy()
+    partitions = {}
+    partition_graph = {}
+    lvl = 1
+    # adding the original graph as the first lvl
+    sub_graphs = nx.connected_component_subgraphs(H)
+    partitions.update({lvl:[k.nodes() for k in sub_graphs]})
+    while(nx.number_connected_components(H)!=H.number_of_nodes()):
+        eb = nx.edge_betweenness(H) # use edge betweenness to find the best edge to remove
+        sorted_eb = sorted(eb.items(), reverse=True, key=operator.itemgetter(1))
+        k,v = sorted_eb[0][0]
+        ncc_before = nx.number_connected_components(H)
+        H.remove_edge(k,v)
+        ncc_after = nx.number_connected_components(H)
+        if ncc_before == ncc_after: continue
+        else:
+            lvl +=1
+            sub_graphs = nx.connected_component_subgraphs(H)
+            partitions.update({lvl:[k.nodes() for k in sub_graphs]})
+            partition_graph.update({lvl:H.copy()})
+
+    return partition_graph, partitions
+
+def plot_dhc(PG, part, labels, lvl, pos):
+    fig = plt.figure(figsize=(9,6))
+    BM=nx.blockmodel(PG, part)
+    node_size=[BM.node[x]['nnodes']*10 for x in BM.nodes()]
+    edge_width=[1 for (u,v,d) in BM.edges(data=True)]
+    BM_pos = nx.spring_layout(BM,iterations=200)
+    plt.axis("off")
+    plt.title("Block Model Clusters at level: {}".format(lvl))
+    nx.draw(BM, BM_pos,node_size=node_size,width=edge_width,with_labels=False)
+    fig = plt.figure(figsize=(9,6))
+    plt.axis("off")
+    plt.title("Node Clusters at level: {}".format(lvl))
+    nx.draw_networkx(PG, pos, node_size=45, cmap = plt.get_cmap("jet"), node_color=labels, with_labels = False)
