@@ -10,6 +10,20 @@ from shapely.geometry import Point
 def get_unique_column_values(df,colname):
 	return df[colname].unique()
 
+def generate_directed_network(edges,labels):
+    g=nx.DiGraph()
+    edge_labels=dict(zip(edges,labels))
+    for edge,label in zip(edges,labels):
+        g.add_edge(edge[0],edge[1],label=label)
+    return g,edge_labels
+
+def generate_line_graph(edge_labels,graph):
+    g2=nx.DiGraph()
+    ln_graph=nx.line_graph(graph)
+    for edge in ln_graph.edges():
+        g2.add_edge(edge_labels[edge[0]],edge_labels[edge[1]])
+    return g2
+
 def generate_clustering_coefficient_plot(g):
     sns.set_style('whitegrid')
     #Ignore nodes with clustering coefficients of zero.
@@ -165,7 +179,8 @@ def plot_network(g,node_dist=1.0,nodecolor='g',nodesize=1200,nodealpha=0.6,edgec
                  edgealpha=0.2,figsize=(9,6),title=None,titlefontsize=20,savefig=False,\
                  filename=None,bipartite=False,bipartite_colors=None,nodelabels=None,
                  edgelabels=None):
-    pos=nx.spring_layout(g,k=node_dist)
+    #pos=nx.spring_layout(g,k=node_dist,iterations=300)
+    pos=nx.spring_layout(g,iterations=300)
     nodes=g.nodes()
     edges=g.edges()
     plt.figure(figsize=figsize)
@@ -187,10 +202,11 @@ def plot_network(g,node_dist=1.0,nodecolor='g',nodesize=1200,nodealpha=0.6,edgec
     labels={}
     for idx,node in enumerate(g.nodes()):
         labels[node]=str(node)
-    
+
     if nodelabels!=None:
         nx.draw_networkx_labels(g,pos,labels,font_size=16)
-
+    if edgelabels!=None: #Assumed that it is a dict with edge tuple as the key and label as value.
+        nx.draw_networkx_edge_labels(g,pos,edgelabels,font_size=12)
     plt.xticks([])
     plt.yticks([])
     if title!=None:
