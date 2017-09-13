@@ -184,7 +184,12 @@ def plot_network(g,nodecolor='g',nodesize=1200,nodealpha=0.6,edgecolor='k',\
                  filename=None,bipartite=False,bipartite_colors=None,nodelabels=None,
                  edgelabels=None):
 <<<<<<< HEAD
+<<<<<<< HEAD
     pos=nx.spring_layout(g,iterations=200)
+=======
+    #pos=nx.spring_layout(g,k=node_dist,iterations=300)
+    pos=nx.spring_layout(g,iterations=300)
+>>>>>>> dev
 =======
     #pos=nx.spring_layout(g,k=node_dist,iterations=300)
     pos=nx.spring_layout(g,iterations=300)
@@ -287,6 +292,10 @@ def plot_dhc(PG, part, labels, lvl, pos):
     edge_width=[1 for (u,v,d) in BM.edges(data=True)]
     BM_pos = nx.spring_layout(BM,iterations=200)
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+    plt.subplot(2, 1, 1)
+>>>>>>> dev
 =======
     plt.subplot(2, 1, 1)
 >>>>>>> dev
@@ -295,6 +304,10 @@ def plot_dhc(PG, part, labels, lvl, pos):
     nx.draw(BM, BM_pos,node_size=node_size,width=edge_width,with_labels=False)
     fig = plt.figure(figsize=(9,6))
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+    plt.subplot(2, 1, 2)
+>>>>>>> dev
 =======
     plt.subplot(2, 1, 2)
 >>>>>>> dev
