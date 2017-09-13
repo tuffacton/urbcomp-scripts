@@ -291,26 +291,10 @@ def plot_dhc(PG, part, labels, lvl, pos):
     node_size=[BM.node[x]['nnodes']*10 for x in BM.nodes()]
     edge_width=[1 for (u,v,d) in BM.edges(data=True)]
     BM_pos = nx.spring_layout(BM,iterations=200)
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-    plt.subplot(2, 1, 1)
->>>>>>> dev
-=======
-    plt.subplot(2, 1, 1)
->>>>>>> dev
     plt.axis("off")
     plt.title("Block Model Clusters at level: {}".format(lvl))
     nx.draw(BM, BM_pos,node_size=node_size,width=edge_width,with_labels=False)
     fig = plt.figure(figsize=(9,6))
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-    plt.subplot(2, 1, 2)
->>>>>>> dev
-=======
-    plt.subplot(2, 1, 2)
->>>>>>> dev
     plt.axis("off")
     plt.title("Node Clusters at level: {}".format(lvl))
     nx.draw_networkx(PG, pos, node_size=45, cmap = plt.get_cmap("jet"), node_color=labels, with_labels = False)
