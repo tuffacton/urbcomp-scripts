@@ -14,6 +14,20 @@ from scipy.spatial import distance
 def get_unique_column_values(df,colname):
 	return df[colname].unique()
 
+def generate_directed_network(edges,labels):
+    g=nx.DiGraph()
+    edge_labels=dict(zip(edges,labels))
+    for edge,label in zip(edges,labels):
+        g.add_edge(edge[0],edge[1],label=label)
+    return g,edge_labels
+
+def generate_line_graph(edge_labels,graph):
+    g2=nx.DiGraph()
+    ln_graph=nx.line_graph(graph)
+    for edge in ln_graph.edges():
+        g2.add_edge(edge_labels[edge[0]],edge_labels[edge[1]])
+    return g2
+
 def generate_clustering_coefficient_plot(g):
     sns.set_style('whitegrid')
     #Ignore nodes with clustering coefficients of zero.
@@ -169,7 +183,12 @@ def plot_network(g,nodecolor='g',nodesize=1200,nodealpha=0.6,edgecolor='k',\
                  edgealpha=0.2,figsize=(9,6),title=None,titlefontsize=20,savefig=False,\
                  filename=None,bipartite=False,bipartite_colors=None,nodelabels=None,
                  edgelabels=None):
+<<<<<<< HEAD
     pos=nx.spring_layout(g,iterations=200)
+=======
+    #pos=nx.spring_layout(g,k=node_dist,iterations=300)
+    pos=nx.spring_layout(g,iterations=300)
+>>>>>>> dev
     nodes=g.nodes()
     edges=g.edges()
     plt.figure(figsize=figsize)
@@ -191,10 +210,11 @@ def plot_network(g,nodecolor='g',nodesize=1200,nodealpha=0.6,edgecolor='k',\
     labels={}
     for idx,node in enumerate(g.nodes()):
         labels[node]=str(node)
-    
+
     if nodelabels!=None:
         nx.draw_networkx_labels(g,pos,labels,font_size=16)
-
+    if edgelabels!=None: #Assumed that it is a dict with edge tuple as the key and label as value.
+        nx.draw_networkx_edge_labels(g,pos,edgelabels,font_size=12)
     plt.xticks([])
     plt.yticks([])
     if title!=None:
@@ -266,10 +286,18 @@ def plot_dhc(PG, part, labels, lvl, pos):
     node_size=[BM.node[x]['nnodes']*10 for x in BM.nodes()]
     edge_width=[1 for (u,v,d) in BM.edges(data=True)]
     BM_pos = nx.spring_layout(BM,iterations=200)
+<<<<<<< HEAD
+=======
+    plt.subplot(2, 1, 1)
+>>>>>>> dev
     plt.axis("off")
     plt.title("Block Model Clusters at level: {}".format(lvl))
     nx.draw(BM, BM_pos,node_size=node_size,width=edge_width,with_labels=False)
     fig = plt.figure(figsize=(9,6))
+<<<<<<< HEAD
+=======
+    plt.subplot(2, 1, 2)
+>>>>>>> dev
     plt.axis("off")
     plt.title("Node Clusters at level: {}".format(lvl))
     nx.draw_networkx(PG, pos, node_size=45, cmap = plt.get_cmap("jet"), node_color=labels, with_labels = False)
