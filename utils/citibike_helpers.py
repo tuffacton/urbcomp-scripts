@@ -183,17 +183,8 @@ def plot_network(g,nodecolor='g',nodesize=1200,nodealpha=0.6,edgecolor='k',\
                  edgealpha=0.2,figsize=(9,6),title=None,titlefontsize=20,savefig=False,\
                  filename=None,bipartite=False,bipartite_colors=None,nodelabels=None,
                  edgelabels=None):
-<<<<<<< HEAD
-<<<<<<< HEAD
-    pos=nx.spring_layout(g,iterations=200)
-=======
-    #pos=nx.spring_layout(g,k=node_dist,iterations=300)
-    pos=nx.spring_layout(g,iterations=300)
->>>>>>> dev
-=======
-    #pos=nx.spring_layout(g,k=node_dist,iterations=300)
-    pos=nx.spring_layout(g,iterations=300)
->>>>>>> dev
+    #pos=nx.spring_layout(g,iterations=200)
+    pos=nx.spring_layout(g,k=node_dist,iterations=300)
     nodes=g.nodes()
     edges=g.edges()
     plt.figure(figsize=figsize)
