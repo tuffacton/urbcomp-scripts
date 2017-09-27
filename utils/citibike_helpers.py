@@ -4,7 +4,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 import operator
-import datetime
+from datetime import datetime, timedelta
 import geopandas as gp #might need to install
 from shapely.geometry import Point
 from collections import defaultdict
@@ -102,7 +102,7 @@ def calculate_trip_durations_citibike(df):
     df['Trip Duration']=df['Stop Time'] - df['Start Time']  #This is still timedelta.
 
     #Convert datetime.timedelta object Trip Duration to floating point number of minutes for ease of plotting.
-    df['Trip Duration Minutes']=df['Trip Duration'].apply(lambda x: datetime.timedelta.total_seconds(x)/60.0)
+    df['Trip Duration Minutes']=df['Trip Duration'].apply(lambda x: timedelta.total_seconds(x)/60.0)
     return df
 
 def create_subset_graph(edges_with_weights,thr=0.005,graphtype='Directed'):
@@ -289,3 +289,35 @@ def plot_dhc(PG, part, labels, lvl, pos):
     plt.axis("off")
     plt.title("Node Clusters at level: {}".format(lvl))
     nx.draw_networkx(PG, pos, node_size=45, cmap = plt.get_cmap("jet"), node_color=labels, with_labels = False)
+
+def generate_gspan_citibike(df, station2id, directed = False, time = 6):
+    start_time = pd.DatetimeIndex(['2017-01-01T00:00:00.000000000'])
+    end_time = pd.DatetimeIndex(['2017-02-01T00:00:00.000000000'])
+    next_time = start_time + timedelta(hours=time)
+
+    fw = open('../datasets/citibike/gspan_{}_{}.data'.format('directed' if directed else 'undirected',time),'w')
+    graph_number = 0
+    if directed:
+        g = nx.DiGraph()
+    else:
+        g = nx.Graph()
+    fw.write('t # {}\n'.format(graph_number))
+    while next_time < end_time:
+        fl = df[(df['Start Time'].values > start_time.values) & (df['Start Time'].values <= next_time.values)]
+        for sts,ens in zip(fl['Start Station ID'].values,fl['End Station ID'].values):
+            if (sts,ens) in g.edges():
+                g[sts][ens]['weight'] = g[sts][ens]['weight']+1
+            else:
+                g.add_edge(sts,ens,weight=1)
+
+        node2id = {station2id[v]:k for k,v in enumerate(g.nodes())}
+        for i, node in enumerate(g.nodes()):
+            fw.write('v {} {}\n'.format(i,station2id[node]))
+        for i, info in enumerate(g.edges(data=True)):
+            fw.write('e {} {} {}\n'.format(node2id[station2id[info[0]]],node2id[station2id[info[1]]],info[2]['weight']))
+        start_time = next_time
+        next_time = start_time + timedelta(hours=time)
+        graph_number += 1
+        fw.write('t # {}\n'.format(graph_number))
+        g.clear()
+    fw.close()
