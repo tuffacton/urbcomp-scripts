@@ -9,7 +9,7 @@ except NameError:
   basestring = str
 # run a sklearn model using (X_train, Y_train)
 # and output the prediction on the X_test
-def run_classifier(model,X_train, Y_train, X_test):
+def run(model,X_train, Y_train, X_test):
     model.fit(X_train, Y_train)
     # make predictions for test data
     y_pred = model.predict(X_test)
@@ -73,5 +73,5 @@ def preprocessing(dt):
     dt['tip_fair_class'][dt['tip_fair']<0.2]=0
     dt['tip_fair_class'][dt['tip_fair']>=0.2]=1
     # remove junk column
-    dt = dt.drop(['VendorID','tip_amount','ehail_fee','lpep_pickup_datetime','lpep_dropoff_datetime','tip_fair'],axis=1)
+    dt = dt.drop(['VendorID','tip_amount','ehail_fee','lpep_pickup_datetime','lpep_dropoff_datetime'],axis=1)
     return dt
