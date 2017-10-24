@@ -5,8 +5,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 import operator
 from datetime import datetime, timedelta
-import geopandas as gp #might need to install
-from shapely.geometry import Point
+try:
+    import geopandas as gp #might need to install
+    from shapely.geometry import Point
+except: #If there is an exception in importing geopandas or shapely, we will ignore it and
+        #simply not import the package.
+    pass
 from collections import defaultdict
 from scipy.cluster import hierarchy
 from scipy.spatial import distance
