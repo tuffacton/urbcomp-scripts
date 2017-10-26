@@ -3,3 +3,4 @@ geopandas==0.3.0
 seaborn==0.7.1
 Shapely==1.6.1
 geopy==1.11.0
+GPy==1.8.4
